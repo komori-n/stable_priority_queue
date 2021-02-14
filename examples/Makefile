@@ -6,15 +6,19 @@ SOURCES = $(shell ls $(SRC_DIR)/*.cpp)
 OBJS    = $(subst $(SRC_DIR),$(OBJ_DIR), $(SOURCES:.cpp=.o))
 PQ_TARGET = priority_queue.out
 SPQ_TARGET = stable_priority_queue.out
-TARGET = $(PQ_TARGET) $(SPQ_TARGET)
+BENCH_TARGET = bench.out
+TARGET = $(PQ_TARGET) $(SPQ_TARGET) $(BENCH_TARGET)
 DEPENDS = $(OBJS:.o=.d)
 
-all: $(PQ_TARGET) $(SPQ_TARGET)
+all: $(TARGET)
 
 $(SPQ_TARGET): $(OBJ_DIR)/stable_priority_queue.o
 	$(CC) -o $@ $<
 
 $(PQ_TARGET): $(OBJ_DIR)/priority_queue.o
+	$(CC) -o $@ $<
+
+$(BENCH_TARGET): $(OBJ_DIR)/bench.o
 	$(CC) -o $@ $<
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
