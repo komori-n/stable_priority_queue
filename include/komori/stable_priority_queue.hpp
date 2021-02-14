@@ -134,8 +134,8 @@ namespace komori {
     }
 
     void push(Key&& key) {
-      auto& copyable_queue = data_[key];
-      copyable_queue.push(std::move(key));
+      auto& top_queue = data_[key];
+      top_queue.push(std::move(key));
     }
 
     template <typename... ArgTypes>
