@@ -54,6 +54,18 @@ void stable_priority_queue_test(std::vector<CopyableEntry>&& data) {
   }
 }
 
+void noncopyable_queue_test(std::vector<CopyableEntry>&& data) {
+  komori::noncopyable_queue<CopyableEntry> queue;
+
+  for (auto&& val : data) {
+    queue.push(std::move(val));
+  }
+
+  while (!queue.empty()) {
+    queue.pop();
+  }
+}
+
 }  // namespace
 
 int main(void) {
@@ -85,6 +97,20 @@ int main(void) {
     auto spq_end = std::chrono::system_clock::now();
     double spq_elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(spq_end - spq_start).count();
     std::cout << "SPQ:  " << spq_elapsed << "ms" << std::endl;
+  }
+
+  {
+    std::mt19937 mt;
+    std::vector<CopyableEntry> data;
+    for (size_t i = 0; i < kTestSize; ++i) {
+      data.push_back(CopyableEntry {dist(mt), i, {}});
+    }
+
+    auto ncpq_start = std::chrono::system_clock::now();
+    noncopyable_queue_test(std::move(data));
+    auto ncpq_end = std::chrono::system_clock::now();
+    double ncpq_elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(ncpq_end - ncpq_start).count();
+    std::cout << "NCPQ: " << ncpq_elapsed << "ms" << std::endl;
   }
 
   return EXIT_SUCCESS;
