@@ -23,7 +23,7 @@ namespace komori {
   }  // namespace detail
 
   template <typename Key,
-      typename Compare>
+      typename Compare = std::less<Key>> 
   class noncopyable_queue {
   public:
     using value_type = Key;
@@ -89,7 +89,7 @@ namespace komori {
   };
 
   template <typename Key,
-      typename Compare>
+      typename Compare = std::less<Key>> 
   class copyable_queue {
   public:
     using value_type = Key;
