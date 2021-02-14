@@ -134,7 +134,7 @@ namespace komori {
     }
 
     void push(Key&& key) {
-      auto copyable_queue = data_[key];
+      auto& copyable_queue = data_[key];
       copyable_queue.push(std::move(key));
     }
 
@@ -144,7 +144,12 @@ namespace komori {
     }
 
     void pop(void) {
-      data_.erase(data_.begin());
+      auto top_pair = data_.begin();
+
+      top_pair->second.pop();
+      if (top_pair->second.empty()) {
+        data_.erase(top_pair);
+      }
     }
 
     void swap(copyable_queue& queue) {
