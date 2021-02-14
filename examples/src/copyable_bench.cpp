@@ -23,10 +23,6 @@ struct CopyableEntry {
   bool operator<(const CopyableEntry& entry) const noexcept {
     return this->val < entry.val;
   }
-
-  void print(void) const {
-    std::cout << val << " " << order << std::endl;
-  }
 };
 
 

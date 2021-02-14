@@ -23,10 +23,6 @@ struct NotCopyableEntry {
   bool operator<(const NotCopyableEntry& entry) const noexcept {
     return this->val < entry.val;
   }
-
-  void print(void) const {
-    std::cout << val << " " << order << std::endl;
-  }
 };
 
 
