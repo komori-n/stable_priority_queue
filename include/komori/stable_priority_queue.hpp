@@ -41,8 +41,8 @@ namespace komori {
         const Compare& comp)
         : data_(ReversedCompare { comp }, std::allocator<Key>()) {}
     noncopyable_queue(std::initializer_list<Key> init,
-        const ReversedCompare& comp=ReversedCompare { Compare() })
-        : data_(std::move(init), comp, std::allocator<Key>()) {}
+        const Compare& comp=Compare())
+        : data_(std::move(init), ReversedCompare { comp }, std::allocator<Key>()) {}
 
     ~noncopyable_queue(void) = default;
     noncopyable_queue& operator=(const noncopyable_queue&) = default;
@@ -107,8 +107,8 @@ namespace komori {
         const Compare& comp)
         : data_(ReversedCompare { comp }) {}
     copyable_queue(std::initializer_list<Key> init,
-        const ReversedCompare& comp=ReversedCompare { Compare() })
-        : data_(std::move(init), comp) {}
+        const Compare& comp=Compare())
+        : data_(std::move(init), ReversedCompare { comp }) {}
 
     ~copyable_queue(void) = default;
     copyable_queue& operator=(const copyable_queue&) = default;
