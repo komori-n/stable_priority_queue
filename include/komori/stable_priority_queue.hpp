@@ -22,14 +22,8 @@ namespace komori {
     };
 
     template <typename Key,
-      typename Compare,
-      bool Copyable = std::is_trivially_copy_constructible<Key>::value &&
-        std::is_trivially_copy_constructible<Key>::value>
-    class queue_base;
-
-    template <typename Key,
         typename Compare>
-    class queue_base<Key, Compare, false> {
+    class noncopyable_queue {
     public:
       using value_type = Key;
       using reference = Key&;
@@ -38,21 +32,21 @@ namespace komori {
 
       using ReversedCompare = detail::reverse_compare<Compare>;
 
-      queue_base(void) : queue_base(Compare()) {};
-      queue_base(const queue_base&) = default;
-      queue_base(queue_base&&) = default;
+      noncopyable_queue(void) : noncopyable_queue(Compare()) {};
+      noncopyable_queue(const noncopyable_queue&) = default;
+      noncopyable_queue(noncopyable_queue&&) = default;
 
-      explicit queue_base(
+      explicit noncopyable_queue(
           const Compare& comp)
           : data_(ReversedCompare { comp }, std::allocator<Key>()) {}
-      queue_base(std::initializer_list<Key> init,
+      noncopyable_queue(std::initializer_list<Key> init,
           const ReversedCompare& comp=ReversedCompare { Compare() })
           : data_(std::move(init), comp, std::allocator<Key>()) {}
 
-      ~queue_base(void) = default;
-      queue_base& operator=(const queue_base&) = default;
-      queue_base& operator=(queue_base&&) = default;
-      queue_base& operator=(std::initializer_list<Key> init) {
+      ~noncopyable_queue(void) = default;
+      noncopyable_queue& operator=(const noncopyable_queue&) = default;
+      noncopyable_queue& operator=(noncopyable_queue&&) = default;
+      noncopyable_queue& operator=(std::initializer_list<Key> init) {
         data_ = std::move(init);
       }
 
@@ -85,7 +79,7 @@ namespace komori {
         data_.erase(data_.begin());
       }
 
-      void swap(queue_base& queue) {
+      void swap(noncopyable_queue& queue) {
         std::swap(data_, queue.data_);
       }
 
@@ -95,7 +89,7 @@ namespace komori {
 
     template <typename Key,
         typename Compare>
-    class queue_base<Key, Compare, true> {
+    class copyable_queue {
     public:
       using value_type = Key;
       using reference = Key&;
@@ -104,21 +98,21 @@ namespace komori {
 
       using ReversedCompare = detail::reverse_compare<Compare>;
 
-      queue_base(void) : queue_base(Compare()) {};
-      queue_base(const queue_base&) = default;
-      queue_base(queue_base&&) = default;
+      copyable_queue(void) : copyable_queue(Compare()) {};
+      copyable_queue(const copyable_queue&) = default;
+      copyable_queue(copyable_queue&&) = default;
 
-      queue_base(
+      copyable_queue(
           const Compare& comp)
           : data_(ReversedCompare { comp }) {}
-      queue_base(std::initializer_list<Key> init,
+      copyable_queue(std::initializer_list<Key> init,
           const ReversedCompare& comp=ReversedCompare { Compare() })
           : data_(std::move(init), comp) {}
 
-      ~queue_base(void) = default;
-      queue_base& operator=(const queue_base&) = default;
-      queue_base& operator=(queue_base&&) = default;
-      queue_base& operator=(std::initializer_list<Key> init) {
+      ~copyable_queue(void) = default;
+      copyable_queue& operator=(const copyable_queue&) = default;
+      copyable_queue& operator=(copyable_queue&&) = default;
+      copyable_queue& operator=(std::initializer_list<Key> init) {
         data_ = std::move(init);
       }
 
@@ -139,8 +133,8 @@ namespace komori {
       }
 
       void push(Key&& key) {
-        auto queue = data_[key];
-        queue.push(std::move(key));
+        auto copyable_queue = data_[key];
+        copyable_queue.push(std::move(key));
       }
 
       template <typename... ArgTypes>
@@ -152,7 +146,7 @@ namespace komori {
         data_.erase(data_.begin());
       }
 
-      void swap(queue_base& queue) {
+      void swap(copyable_queue& queue) {
         std::swap(data_, queue.data_);
       }
 
@@ -163,8 +157,11 @@ namespace komori {
 
   template <typename Key,
       typename Compare = std::less<Key>> 
-  class stable_priority_queue : public detail::queue_base<Key, Compare> {};
-
+  using stable_priority_queue = typename std::conditional<
+    std::is_trivially_copy_constructible<Key>::value &&
+      std::is_trivially_copy_assignable<Key>::value,
+    detail::copyable_queue<Key, Compare>,
+    detail::noncopyable_queue<Key, Compare>>::type;
 
   template <typename Key, typename Compare>
   void swap(stable_priority_queue<Key, Compare>& left,
