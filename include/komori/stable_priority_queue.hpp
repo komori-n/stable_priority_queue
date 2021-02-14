@@ -158,8 +158,8 @@ namespace komori {
   template <typename Key,
       typename Compare = std::less<Key>> 
   using stable_priority_queue = typename std::conditional<
-    std::is_trivially_copy_constructible<Key>::value &&
-      std::is_trivially_copy_assignable<Key>::value,
+    std::is_copy_constructible<Key>::value &&
+      std::is_copy_assignable<Key>::value,
     copyable_queue<Key, Compare>,
     noncopyable_queue<Key, Compare>>::type;
 
