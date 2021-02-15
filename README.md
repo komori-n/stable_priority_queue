@@ -1,5 +1,7 @@
 # stable-priority-queue
 
+![examples](https://github.com/komori-n/stable_priority_queue/workflows/C/C++%20CI/badge.svg)
+
 priority queue preserving insertion order
 
 
