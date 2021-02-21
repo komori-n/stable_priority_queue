@@ -1,4 +1,4 @@
-# stable-priority-queue
+# stable_priority_queue
 
 ![examples](https://github.com/komori-n/stable_priority_queue/workflows/examples/badge.svg)
 
