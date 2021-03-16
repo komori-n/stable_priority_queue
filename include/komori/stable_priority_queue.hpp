@@ -5,25 +5,24 @@
 #include <set>
 #include <map>
 #include <memory>
+#include <queue>
 
 
 namespace komori {
   namespace detail {
     template <typename Comp>
     struct reverse_compare {
-      using first_argument_type = typename Comp::first_argument_type;
-      using second_argument_type = typename Comp::second_argument_type;
-
-      bool operator()(const first_argument_type& x, const first_argument_type& y) const {
+      template <typename T, typename U>
+      bool operator()(const T& x, const U& y) const {
         return comp(y, x);
       }
 
-      const Comp& comp;
+      Comp comp;
     };
   }  // namespace detail
 
   template <typename Key,
-      typename Compare = std::less<Key>> 
+      typename Compare = std::less<Key>>
   class noncopyable_queue {
   public:
     using value_type = Key;
@@ -40,6 +39,7 @@ namespace komori {
     explicit noncopyable_queue(
         const Compare& comp)
         : data_(ReversedCompare { comp }, std::allocator<Key>()) {}
+    template <typename Key_=Key, std::enable_if_t<std::is_copy_constructible<Key_>::value>>
     noncopyable_queue(std::initializer_list<Key> init,
         const Compare& comp=Compare())
         : data_(std::move(init), ReversedCompare { comp }, std::allocator<Key>()) {}
@@ -58,7 +58,7 @@ namespace komori {
     size_t size(void) const {
       return data_.size();
     }
-    
+
     const Key& top(void) const {
       return *data_.begin();
     }
@@ -89,7 +89,7 @@ namespace komori {
   };
 
   template <typename Key,
-      typename Compare = std::less<Key>> 
+      typename Compare = std::less<Key>>
   class copyable_queue {
   public:
     using value_type = Key;
@@ -108,13 +108,20 @@ namespace komori {
         : data_(ReversedCompare { comp }) {}
     copyable_queue(std::initializer_list<Key> init,
         const Compare& comp=Compare())
-        : data_(std::move(init), ReversedCompare { comp }) {}
+        : data_(ReversedCompare { comp }) {
+      for (auto&& v : std::move(init)) {
+        push(std::move(v));
+      }
+    }
 
     ~copyable_queue(void) = default;
     copyable_queue& operator=(const copyable_queue&) = default;
     copyable_queue& operator=(copyable_queue&&) = default;
     copyable_queue& operator=(std::initializer_list<Key> init) {
-      data_ = std::move(init);
+      for (auto&& v : std::move(init)) {
+        push(std::move(v));
+      }
+      return *this;
     }
 
     bool empty(void) const {
@@ -122,9 +129,13 @@ namespace komori {
     }
 
     size_t size(void) const {
-      return data_.size();
+      size_t size_tmp { 0 };
+      for (const auto& kv : data_) {
+        size_tmp += kv.second.size();
+      }
+      return size_tmp;
     }
-    
+
     const Key& top(void) const {
       return data_.begin()->second.front();
     }
@@ -161,7 +172,7 @@ namespace komori {
   };
 
   template <typename Key,
-      typename Compare = std::less<Key>> 
+      typename Compare = std::less<Key>>
   using stable_priority_queue = typename std::conditional<
     std::is_copy_constructible<Key>::value &&
       std::is_copy_assignable<Key>::value,
