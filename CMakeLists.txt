@@ -25,3 +25,6 @@ target_include_directories(${PROGRAM}
     include
     third-party/googletest/googletest/include
 )
+
+enable_testing()
+add_test(NAME StablePriorityQueueTest COMMAND queue_test)
