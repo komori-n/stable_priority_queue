@@ -1,4 +1,4 @@
-CC      = g++ -O3 -std=c++11
+CC      = g++ -O3 -std=c++14
 CFLAGS  = -Wall -Wextra -I../include
 SRC_DIR = ./src
 OBJ_DIR = ./obj
