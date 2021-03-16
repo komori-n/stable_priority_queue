@@ -1,5 +1,6 @@
 # stable_priority_queue
 
+[![Test](https://github.com/komori-n/stable_priority_queue/actions/workflows/test.yml/badge.svg)](https://github.com/komori-n/stable_priority_queue/actions/workflows/test.yml)
 ![examples](https://github.com/komori-n/stable_priority_queue/workflows/examples/badge.svg)
 
 priority queue preserving insertion order
